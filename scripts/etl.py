@@ -7,8 +7,10 @@ def load_data() -> pd.DataFrame:
 
     # If parquet file exists skip transformation and load and return parquet
     if parquet_pth.is_file():
+        print("INFO: Reading from parquet file")
         return pd.read_parquet(parquet_pth)
     else:
+        print("INFO: Parsing CSV datasets")
         # Apache Arrow bindings can handle mixed types and is faster
         # And supports MT however is inconplete.
         # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html
@@ -71,6 +73,6 @@ def load_data() -> pd.DataFrame:
         merged["Book-Title"] = merged["Book-Title"].str.lower()
         # Save as Parquet file so I dont have to do this every time
         # (In case dataset did not change ofc.)
-        merged.to_parquet("results/dataset2.parquet")
+        merged.to_parquet("results/dataset.parquet")
 
         return merged

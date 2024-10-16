@@ -21,12 +21,19 @@ def load_data() -> pd.DataFrame:
             delimiter=";",
             on_bad_lines="skip",
             engine="pyarrow",
-            dtype={"Book-Title": str},
+            dtype={
+                "Book-Title": str,
+            },
+            parse_dates="Year-Of-Publication",
         )
 
         # Dataset has missing values, dropping these rows.
         books = books.dropna()
         books = books.drop_duplicates()
+
+        books["Year-Of-Publication"] = pd.to_datetime(
+            books["Year-Of-Publication"], format="&Y"
+        )
 
         # Need to specify the User-ID dtype becuase Apache Arrow converts it to number
         ratings = pd.read_csv(

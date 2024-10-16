@@ -1,49 +1,32 @@
-from numpy.random.mtrand import sample
 import pandas as pd
 
 
-def define_occurence_treshold(df: pd.DataFrame, uniq_users) -> pd.DataFrame:
-    # Treshold should be the maximum number that produces 40 results at minimum
-    # Otherwise correlation calculation may be very inaccured
+def create_recommendation(user_input: str, data: pd.DataFrame):
 
-    data_to_process = df.query("`User-ID` in @uniq_users").copy()
+    # Select only rows that contains rating of user selected book
+    user_books = data.query("`Book-Title` == @user_input")
 
-    treshold = data_to_process["Votes-Number"].max(axis=0)
+    # Group by USER to eliminate possible duplicate rating and save mean
+    # values of the ratings
+    user_books = user_books.groupby("User-ID")["Book-Rating"].mean()
+    user_books = user_books.reset_index()
 
-    count = 0
-    data = pd.DataFrame()
+    # Set treshold to the number of unique ratings. This is base lenght of
+    # our dataset A.
+    TRESHOLD = len(user_books["Book-Rating"])
 
-    # NOTE: This may or may not be very expensive, depends on initial dataset size
-    # Count value is determined by following: Bonett and Wright (2000),
-    # Sample size requirements for estimating ¨Pearson, Kendall and Spearman correlations,
-    # Psychometrika, 65(1), 23-2
-    # And
-    # https://www.researchgate.net/post/What-is-the-minimum-sample-size-to-run-Pearsons-R
-    sufficient_sample = 30
+    # Search for all books that have same number of votes as treshold
+    books_to_evaluate = data.query("`Votes-Number` >= @TRESHOLD")
 
-    while count < sufficient_sample:
-        data = data_to_process.query("`Votes-Number` >= @treshold")
-        count = data.shape[0]
+    # Also remove duplicates by groupb
+    books_to_evaluate = books_to_evaluate.groupby(["User-ID", "Book-Title"])[
+        "Book-Rating"
+    ].mean()
+    books_to_evaluate = books_to_evaluate.reset_index()
 
-        if count >= sufficient_sample:
-            break
+    books_to_evaluate.info()
 
-        treshold = treshold - 1
-
-    print(f"Found optimal treshold of: {treshold}")
-
-    return data
-
-
-def create_recommendation(user_input: dict, data: pd.DataFrame):
-    # Calculate number of votes per user
-
-    # Find all users that voted for searched book, so then the
-    # dataset is smaller
-    book_ratings = data.query("`Book-Title` == @user_input").copy()
-
-    book_voters = book_ratings["User-ID"].unique()
-
-    book_for_corr = define_occurence_treshold(data, book_voters)
-
-    print(book_for_corr.info())
+    # Create pivot
+    books_pivot = books_to_evaluate.pivot(
+        index="User-ID", columns="Book-Title", values="Book-Rating"
+    )

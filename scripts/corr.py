@@ -1,32 +1,61 @@
 import pandas as pd
+import logging
 
 
-def create_recommendation(user_input: str, data: pd.DataFrame):
+def calculate_recommendations(
+    books: pd.DataFrame, searched: str
+) -> pd.DataFrame:
+    logging.info("Calculating recommendations")
+    user_book_raters = books.query("`Book-Title` == @searched")
 
-    # Select only rows that contains rating of user selected book
-    user_books = data.query("`Book-Title` == @user_input")
+    users_uniq = user_book_raters["User-ID"].unique()
 
-    # Group by USER to eliminate possible duplicate rating and save mean
-    # values of the ratings
-    user_books = user_books.groupby("User-ID")["Book-Rating"].mean()
-    user_books = user_books.reset_index()
+    TRESHOLD = 50
 
-    # Set treshold to the number of unique ratings. This is base lenght of
-    # our dataset A.
-    TRESHOLD = len(user_books["Book-Rating"])
+    raters_other_books = books.query(
+        "`User-ID` in @users_uniq and `Rating-Count` > @TRESHOLD and `Book-Title` != @searched"
+    )
 
-    # Search for all books that have same number of votes as treshold
-    books_to_evaluate = data.query("`Votes-Number` >= @TRESHOLD")
+    raters_other_books_uniq = raters_other_books["User-ID"].unique()
 
-    # Also remove duplicates by groupb
-    books_to_evaluate = books_to_evaluate.groupby(["User-ID", "Book-Title"])[
-        "Book-Rating"
-    ].mean()
-    books_to_evaluate = books_to_evaluate.reset_index()
+    true_unique_readers = set(users_uniq).intersection(raters_other_books_uniq)
 
-    books_to_evaluate.info()
+    user_book_raters = user_book_raters.query(
+        "`User-ID` in @true_unique_readers"
+    )
 
-    # Create pivot
-    books_pivot = books_to_evaluate.pivot(
+    raters_other_books = (
+        raters_other_books.groupby(["User-ID", "Book-Title"])["Book-Rating"]
+        .mean()
+        .reset_index()
+    )
+
+    pivot_books = raters_other_books.pivot(
         index="User-ID", columns="Book-Title", values="Book-Rating"
     )
+
+    pivot_user_book = user_book_raters.pivot(
+        index="User-ID", columns="Book-Title", values="Book-Rating"
+    )
+
+    pivot_books = pivot_books.fillna(0)
+
+    user_book = pivot_user_book[searched]
+
+    corrs = []
+    book_names = []
+
+    for col in pivot_books.columns.values:
+
+        book = pivot_books[col]
+
+        if isinstance(book, pd.Series) and isinstance(user_book, pd.Series):
+            if book.nunique() > 1:
+                corrs.append(book.corr(user_book))
+                book_names.append(col)
+
+    result = pd.DataFrame({"Book-Title": book_names, "Correlation": corrs})
+
+    result = result.sort_values(by="Correlation", ascending=False).head(10)
+
+    return result

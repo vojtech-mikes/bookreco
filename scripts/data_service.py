@@ -1,16 +1,22 @@
 import pandas as pd
-from etl import load_data
-from corr import create_recommendation
+import logging
+from scripts.etl import load_data
+from scripts.corr import calculate_recommendations
 
 
-def recommend(user_input):
-    data = load_data()
+def create_response(searched: str) -> str:
+    data, base = load_data()
 
-    return create_recommendation(user_input, data)
+    response = calculate_recommendations(data, searched)
 
+    response = response.merge(base, on="Book-Title", how="left")
 
-# NOTE: Smazat, tohle je jen pro dev
+    response = response.drop_duplicates(subset=["Book-Title"])
 
-dummy = "the hobbit"
+    response = response[["Title", "Book-Author", "ISBN"]].to_html(
+        classes=("uk-table", " uk-table-striped", " uk-table-small"),
+        index=False,
+    )
 
-recommend(dummy)
+    logging.info("Returning HTML response")
+    return response

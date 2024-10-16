@@ -47,17 +47,12 @@ def load_data() -> pd.DataFrame:
         # in this case
         clear_ratings = ratings.query("`Book-Rating` > 0")
 
-        # Calculate avg rating for ISBN
-        avg_ratings = (
-            clear_ratings.groupby("ISBN")["Book-Rating"].mean().reset_index()
-        )
-
-        # Rename Book-Ratings in avg ratings otherwise I get dups in colls later
-        avg_ratings = avg_ratings.rename(columns={"Book-Rating": "Avg-Rating"})
+        # Convert text in book-title col to lowercase so it is easier to
+        # search in the there
+        books["Book-Title"] = books["Book-Title"].str.lower()
 
         # Merge all DFs together
         merged = clear_ratings.merge(books, on="ISBN", how="left")
-        merged = merged.merge(avg_ratings, on="ISBN", how="left")
 
         # After merge there are some missing values
         # (ISBN from ratings in not in book df)
@@ -68,11 +63,23 @@ def load_data() -> pd.DataFrame:
             columns=["Image-URL-S", "Image-URL-M", "Image-URL-L", "Publisher"],
         )
 
-        # Convert text in book-title col to lowercase so it is easier to
-        # search in the there
-        merged["Book-Title"] = merged["Book-Title"].str.lower()
+        number_of_votes = (
+            merged.groupby("Book-Title")["Book-Rating"]
+            .agg("count")
+            .reset_index()
+        )
+
+        number_of_votes = number_of_votes.rename(
+            columns={"Book-Rating": "Votes-Number"}
+        )
+
+        merged = merged.merge(
+            number_of_votes, on="Book-Title", how="left"
+        ).reset_index(drop=True)
+
         # Save as Parquet file so I dont have to do this every time
         # (In case dataset did not change ofc.)
+
         merged.to_parquet("results/dataset.parquet")
 
         return merged

@@ -1,4 +1,4 @@
-name: bookreco2
+name: bookreco
 channels:
   - defaults
 dependencies:
@@ -88,4 +88,4 @@ dependencies:
   - zipp=3.20.2=py39hca03da5_0
   - zlib=1.2.13=h18a0788_1
   - zstd=1.5.6=hfb09047_0
-prefix: /Users/vojta/miniconda3/envs/bookreco2
+prefix: /Users/vojta/miniconda3/envs/bookreco

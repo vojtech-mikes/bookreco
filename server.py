@@ -20,3 +20,8 @@ def rcm():
     resp = make_response(render_template("result_table.html", table=result))
 
     return resp
+
+
+@app.errorhandler(ValueError)
+def server_error(e):
+    return render_template("server_error.html")

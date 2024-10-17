@@ -5,12 +5,12 @@
         <!-- UIkit CSS -->
         <link
             rel="stylesheet"
-            href="https://cdn.jsdelivr.net/npm/uikit@3.21.13/dist/css/uikit.min.css"
+            href="{{ url_for('static', filename='uikit.min.css') }}"
         />
 
         <!-- UIkit JS -->
-        <script src="https://cdn.jsdelivr.net/npm/uikit@3.21.13/dist/js/uikit.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/uikit@3.21.13/dist/js/uikit-icons.min.js"></script>
+        <script src="{{ url_for('static', filename='uikit-icons.js') }}"></script>
+        <script src="{{ url_for('static', filename='uikit.min.js') }}"></script>
     </head>
     <body>
         <div style="margin-top: 40px" class="uk-container uk-container-small">
@@ -36,6 +36,6 @@
         <div class="uk-margin uk-container uk-container-small">
             <div id="tablehere"></div>
         </div>
-        <script src="https://unpkg.com/htmx.org@2.0.3"></script>
+        <script src="{{ url_for('static', filename='htmx.min.js') }}"></script>
     </body>
 </html>

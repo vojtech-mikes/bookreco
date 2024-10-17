@@ -31,6 +31,7 @@ dependencies:
   - importlib-metadata=7.0.1=py39hca03da5_0
   - itsdangerous=2.2.0=py39hca03da5_0
   - jinja2=3.1.4=py39hca03da5_0
+  - joblib=1.4.2=py39hca03da5_0
   - krb5=1.20.1=hf3e1bf2_1
   - libabseil=20240116.2=cxx17_h313beb8_0
   - libboost=1.82.0=h0bc93f9_2
@@ -64,16 +65,20 @@ dependencies:
   - pandas=2.2.2=py39h313beb8_0
   - pip=24.2=py39hca03da5_0
   - pyarrow=16.1.0=py39h46d7db6_0
+  - pybind11-abi=4=hd3eb1b0_1
   - python=3.9.20=hb885b13_1
   - python-dateutil=2.9.0post0=py39hca03da5_2
   - python-tzdata=2023.3=pyhd3eb1b0_0
   - pytz=2024.1=py39hca03da5_0
   - re2=2022.04.01=hc377ac9_0
   - readline=8.2=h1a28f6b_0
+  - scikit-learn=1.5.1=py39h46d7db6_0
+  - scipy=1.13.1=py39hd336fd7_0
   - setuptools=75.1.0=py39hca03da5_0
   - six=1.16.0=pyhd3eb1b0_1
   - snappy=1.2.1=h313beb8_0
   - sqlite=3.45.3=h80987f9_0
+  - threadpoolctl=3.5.0=py39h33ce5c2_0
   - tk=8.6.14=h6ba3021_0
   - tzdata=2024b=h04d1e81_0
   - utf8proc=2.6.1=h80987f9_1

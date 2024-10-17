@@ -1,13 +1,19 @@
 import pandas as pd
 import logging
 from scripts.etl import load_data
-from scripts.corr import calculate_recommendations
+from scripts.corr import calculate_recommendations_corr
+from scripts.cos_sim import calculate_recommendations_sim
 
 
-def create_response(searched: str) -> str:
+def create_response(searched: str, typ: str) -> str:
     data, base = load_data()
 
-    response = calculate_recommendations(data, searched)
+    response = pd.DataFrame()
+
+    if typ == "corr":
+        response = calculate_recommendations_corr(data, searched)
+    else:
+        response = calculate_recommendations_sim(data, searched)
 
     response = response.merge(base, on="Book-Title", how="left")
 

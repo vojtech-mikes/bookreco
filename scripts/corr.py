@@ -1,34 +1,13 @@
 import pandas as pd
 import logging
+from scripts.utils import prepare_data
 
 
-def calculate_recommendations(
+def calculate_recommendations_corr(
     books: pd.DataFrame, searched: str
 ) -> pd.DataFrame:
     logging.info("Calculating recommendations")
-    user_book_raters = books.query("`Book-Title` == @searched")
-
-    users_uniq = user_book_raters["User-ID"].unique()
-
-    TRESHOLD = 50
-
-    raters_other_books = books.query(
-        "`User-ID` in @users_uniq and `Rating-Count` > @TRESHOLD and `Book-Title` != @searched"
-    )
-
-    raters_other_books_uniq = raters_other_books["User-ID"].unique()
-
-    true_unique_readers = set(users_uniq).intersection(raters_other_books_uniq)
-
-    user_book_raters = user_book_raters.query(
-        "`User-ID` in @true_unique_readers"
-    )
-
-    raters_other_books = (
-        raters_other_books.groupby(["User-ID", "Book-Title"])["Book-Rating"]
-        .mean()
-        .reset_index()
-    )
+    user_book_raters, raters_other_books = prepare_data(books, searched)
 
     pivot_books = raters_other_books.pivot(
         index="User-ID", columns="Book-Title", values="Book-Rating"

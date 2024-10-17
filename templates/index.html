@@ -18,6 +18,11 @@
             <form>
                 <label for="book-title">Book title</label>
                 <input name="search_term" class="uk-input" id="book-title" />
+                <label for="book-typ">Recommendation method</label>
+                <select name="search_typ" class="uk-select" id="book-typ">
+                    <option selected value="corr">Correlation</option>
+                    <option value="cos_sim">Cosine similarity</option>
+                </select>
                 <button
                     class="uk-button uk-button-default uk-margin uk-align-right"
                     hx-post="/rcm"

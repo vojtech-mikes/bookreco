@@ -1,6 +1,7 @@
 from pathlib import Path
 import pandas as pd
 import logging
+from scripts.db_service import save_to_db
 
 
 def load_data():
@@ -68,5 +69,9 @@ def load_data():
         # Export to parquet
         clean_books_ratings.to_parquet("results/dataset.parquet", index=False)
         books.to_parquet("results/baseset.parquet", index=False)
+
+        # Export to MySQL
+        # Arguments are order sensitive
+        save_to_db([clean_books_ratings, books], ["clean_books", "books"])
 
         return clean_books_ratings, ratings_with_books

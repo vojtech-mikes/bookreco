@@ -3,10 +3,16 @@ import logging
 from scripts.etl import load_data
 from scripts.corr import calculate_recommendations_corr
 from scripts.cos_sim import calculate_recommendations_sim
+from scripts.db_service import read_from_db
 
 
 def create_response(searched: str, typ: str) -> str:
-    data, base = load_data()
+
+    # I should not fetch whoe dataset but just that part that is needed
+    data, base = read_from_db("clean_books"), read_from_db("books")
+
+    if data is None or base is None:
+        data, base = load_data()
 
     response = pd.DataFrame()
 

@@ -49,10 +49,10 @@ def load_data():
         )
 
         clean_books_ratings = (
-            ratings_with_books.groupby(["User-ID", "Book-Title"])["Book-Rating"]
-            .mean()
-            .reset_index()
-        )
+            ratings_with_books.groupby(["User-ID", "Book-Title"])[
+                "Book-Rating"
+            ].mean()
+        ).reset_index()
 
         ratings_per_book = (
             clean_books_ratings.groupby("Book-Title")["Book-Rating"]

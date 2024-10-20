@@ -32,6 +32,7 @@ def load_data():
 
         books = books.dropna()
 
+        # just for output form
         books["Title"] = books["Book-Title"]
 
         books["Book-Title"] = books["Book-Title"].str.lower()
@@ -69,4 +70,4 @@ def load_data():
         clean_books_ratings.to_parquet("results/dataset.parquet", index=False)
         books.to_parquet("results/baseset.parquet", index=False)
 
-        return clean_books_ratings, ratings_with_books
+        return clean_books_ratings, books
